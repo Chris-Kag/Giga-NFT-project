@@ -4,7 +4,6 @@ import { useLookupAddress } from "eth-hooks/dapps/ens";
 import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
 import Blockie from "./Blockie";
-import { ethers } from "ethers";
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -33,8 +32,6 @@ import { ethers } from "ethers";
                           or onChange={address => { setToAddress(address);}}
 */
 
-const isENS = (address = "") => address.endsWith(".eth") || address.endsWith(".xyz");
-
 export default function AddressInput(props) {
   const { ensProvider, onChange } = props;
   const [value, setValue] = useState(props.value);
@@ -47,7 +44,7 @@ export default function AddressInput(props) {
     async newValue => {
       if (typeof newValue !== "undefined") {
         let address = newValue;
-        if (isENS(address)) {
+        if (address.indexOf(".eth") > 0 || address.indexOf(".xyz") > 0) {
           try {
             const possibleAddress = await ensProvider.resolveName(address);
             if (possibleAddress) {
@@ -112,7 +109,7 @@ export default function AddressInput(props) {
         autoFocus={props.autoFocus}
         placeholder={props.placeholder ? props.placeholder : "address"}
         prefix={<Blockie address={currentValue} size={8} scale={3} />}
-        value={ethers.utils.isAddress(currentValue) && !isENS(currentValue) && isENS(ens) ? ens : currentValue}
+        value={ens || currentValue}
         addonAfter={
           <div
             style={{ marginTop: 4, cursor: "pointer" }}
